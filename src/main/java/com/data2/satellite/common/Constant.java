@@ -1,4 +1,4 @@
-package com.satellite.framework.common;
+package com.data2.satellite.common;
 
 public interface Constant {
 

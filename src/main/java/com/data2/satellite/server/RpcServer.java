@@ -1,10 +1,10 @@
-package com.satellite.framework.server;
+package com.data2.satellite.server;
 
-import com.satellite.framework.protocol.RpcDecoder;
-import com.satellite.framework.protocol.RpcEncoder;
-import com.satellite.framework.protocol.RpcRequest;
-import com.satellite.framework.protocol.RpcResponse;
-import com.satellite.framework.registry.ServiceRegistry;
+import com.data2.satellite.protocol.RpcDecoder;
+import com.data2.satellite.protocol.RpcEncoder;
+import com.data2.satellite.protocol.RpcRequest;
+import com.data2.satellite.protocol.RpcResponse;
+import com.data2.satellite.registry.ServiceRegistry;
 import com.satellite.framework.service.comm.RpcService;
 
 import io.netty.bootstrap.ServerBootstrap;

@@ -1,4 +1,4 @@
-package com.satellite.framework.common.util;
+package com.data2.satellite.common.util;
 
 import com.dyuproject.protostuff.LinkedBuffer;
 import com.dyuproject.protostuff.ProtostuffIOUtil;

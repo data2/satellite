@@ -1,4 +1,4 @@
-package com.satellite.framework.registry;
+package com.data2.satellite.registry;
 
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;

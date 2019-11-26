@@ -1,7 +1,7 @@
-package com.satellite.framework.server;
+package com.data2.satellite.server;
 
-import com.satellite.framework.protocol.RpcRequest;
-import com.satellite.framework.protocol.RpcResponse;
+import com.data2.satellite.protocol.RpcRequest;
+import com.data2.satellite.protocol.RpcResponse;
 import io.netty.channel.ChannelFutureListener;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;

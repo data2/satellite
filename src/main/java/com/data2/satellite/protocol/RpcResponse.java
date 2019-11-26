@@ -1,4 +1,4 @@
-package com.satellite.framework.protocol;
+package com.data2.satellite.protocol;
 
 public class RpcResponse {
 

@@ -1,4 +1,4 @@
-package com.satellite.framework.server;
+package com.data2.satellite.server;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
