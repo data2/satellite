@@ -1,0 +1,7 @@
+
+
+satellite:
+  registry:
+    address:
+  server:
+    address: 10.143.131.60:9527

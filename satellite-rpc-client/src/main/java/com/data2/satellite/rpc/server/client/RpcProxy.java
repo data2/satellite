@@ -7,7 +7,9 @@ import java.util.UUID;
 import com.data2.satellite.rpc.server.protocol.RpcRequest;
 import com.data2.satellite.rpc.server.protocol.RpcResponse;
 import com.data2.satellite.rpc.server.registry.ServiceDiscovery;
+import org.springframework.stereotype.Component;
 
+@Component
 public class RpcProxy {
 
     private String serverAddress;
