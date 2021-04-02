@@ -1,4 +1,4 @@
-package com.data2.satellite.rpc.common.protocol;
+package com.data2.satellite.rpc.common.utils;
 
 import com.dyuproject.protostuff.LinkedBuffer;
 import com.dyuproject.protostuff.ProtostuffIOUtil;
