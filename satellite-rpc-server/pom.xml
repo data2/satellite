@@ -22,6 +22,14 @@
 
 	<dependencies>
 
+
+		<dependency>
+			<groupId>com.data2</groupId>
+			<artifactId>satellite-rpc-common</artifactId>
+			<version>1.0.0</version>
+		</dependency>
+
+
 		<!-- spring -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

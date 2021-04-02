@@ -1,9 +1,9 @@
 package com.data2.satellite.rpc.server.client;
 
-import com.data2.satellite.rpc.server.protocol.RpcDecoder;
-import com.data2.satellite.rpc.server.protocol.RpcEncoder;
-import com.data2.satellite.rpc.server.protocol.RpcRequest;
-import com.data2.satellite.rpc.server.protocol.RpcResponse;
+import com.data2.satellite.rpc.common.protocol.RpcDecoder;
+import com.data2.satellite.rpc.common.protocol.RpcEncoder;
+import com.data2.satellite.rpc.common.protocol.RpcRequest;
+import com.data2.satellite.rpc.common.protocol.RpcResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

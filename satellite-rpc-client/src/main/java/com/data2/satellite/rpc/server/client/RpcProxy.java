@@ -1,18 +1,24 @@
 package com.data2.satellite.rpc.server.client;
 
+import com.data2.satellite.rpc.common.protocol.RpcRequest;
+import com.data2.satellite.rpc.common.protocol.RpcResponse;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.util.UUID;
 
-import com.data2.satellite.rpc.server.protocol.RpcRequest;
-import com.data2.satellite.rpc.server.protocol.RpcResponse;
-import com.data2.satellite.rpc.server.registry.ServiceDiscovery;
-import org.springframework.stereotype.Component;
-
+/**
+ * @author data2
+ * @description
+ * @date 2021/4/2 下午2:51
+ */
 @Component
 public class RpcProxy {
 
     private String serverAddress;
+    @Autowired
     private ServiceDiscovery serviceDiscovery;
 
     public RpcProxy(String serverAddress) {
@@ -26,33 +32,33 @@ public class RpcProxy {
     @SuppressWarnings("unchecked")
     public <T> T create(Class<?> interfaceClass) {
         return (T) java.lang.reflect.Proxy.newProxyInstance(
-            interfaceClass.getClassLoader(),
-            new Class<?>[]{interfaceClass},
-            new InvocationHandler() {
-                @Override
-                public Object invoke(Object proxy, Method method, Object[] args)
-                        throws Throwable {
-                    RpcRequest request = new RpcRequest(); // 创建并初始化 RPC 请求
-                    request.setRequestId(UUID.randomUUID().toString());
-                    request.setClassName(method.getDeclaringClass().getName());
-                    request.setMethodName(method.getName());
-                    request.setParameterTypes(method.getParameterTypes());
-                    request.setParameters(args);
+                interfaceClass.getClassLoader(),
+                new Class<?>[]{interfaceClass},
+                new InvocationHandler() {
+                    @Override
+                    public Object invoke(Object proxy, Method method, Object[] args)
+                            throws Throwable {
+                        RpcRequest request = new RpcRequest(); // 创建并初始化 RPC 请求
+                        request.setRequestId(UUID.randomUUID().toString());
+                        request.setClassName(method.getDeclaringClass().getName());
+                        request.setMethodName(method.getName());
+                        request.setParameterTypes(method.getParameterTypes());
+                        request.setParameters(args);
 
-                    if (serviceDiscovery != null) {
-                        serverAddress = serviceDiscovery.discover(); // 发现服务
+                        if (serviceDiscovery != null) {
+                            serverAddress = serviceDiscovery.discover(); // 发现服务
+                        }
+
+                        String[] array = serverAddress.split(":");
+                        String host = array[0];
+                        int port = Integer.parseInt(array[1]);
+
+                        RpcClient client = new RpcClient(host, port); // 初始化 RPC 客户端
+                        RpcResponse response = client.send(request); // 通过 RPC 客户端发送 RPC 请求并获取 RPC 响应
+
+                        return response.getResult();
                     }
-
-                    String[] array = serverAddress.split(":");
-                    String host = array[0];
-                    int port = Integer.parseInt(array[1]);
-
-                    RpcClient client = new RpcClient(host, port); // 初始化 RPC 客户端
-                    RpcResponse response = client.send(request); // 通过 RPC 客户端发送 RPC 请求并获取 RPC 响应
-
-                    return response.getResult();
                 }
-            }
         );
     }
 }

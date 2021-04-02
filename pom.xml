@@ -16,6 +16,7 @@
         <module>example-server-api</module>
         <module>example-server</module>
         <module>example-client</module>
+        <module>satellite-rpc-common</module>
     </modules>
 
     <properties>
