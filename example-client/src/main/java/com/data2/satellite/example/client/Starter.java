@@ -1,8 +1,7 @@
 package com.data2.satellite.example.client;
 
 import com.data2.satellite.example.server.api.HiService;
-import com.data2.satellite.rpc.server.client.RpcClient;
-import com.data2.satellite.rpc.server.client.RpcProxy;
+import com.data2.satellite.rpc.server.client.client.RpcProxy;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
