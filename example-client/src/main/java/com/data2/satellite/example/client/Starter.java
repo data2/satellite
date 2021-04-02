@@ -22,12 +22,12 @@ public class Starter {
     @Autowired
     private RpcProxy rpcProxy;
 
-    public static void main(Object[] args){
+    public static void main(Object[] args) {
         SpringApplication.run(Starter.class);
     }
 
     @GetMapping("/test")
-    public void test(){
-        ((HiService)rpcProxy.create(HiService.class)).hi();
+    public void test() {
+        ((HiService) rpcProxy.create(HiService.class)).hi();
     }
 }

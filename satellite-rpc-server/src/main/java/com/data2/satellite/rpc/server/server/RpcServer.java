@@ -35,14 +35,12 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Component
 public class RpcServer implements ApplicationContextAware, InitializingBean {
 
+    private static ThreadPoolExecutor threadPoolExecutor;
     @Autowired
     private ServerConfig serverConfig;
     @Autowired
     private ServiceRegistry serviceRegistry;
-
     private Map<String, Object> handlerMap = new HashMap<>();
-
-    private static ThreadPoolExecutor threadPoolExecutor;
 
     @Override
     public void setApplicationContext(ApplicationContext ctx) throws BeansException {

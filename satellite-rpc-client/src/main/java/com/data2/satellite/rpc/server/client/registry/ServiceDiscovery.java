@@ -62,17 +62,22 @@ public class ServiceDiscovery implements InitializingBean {
 
                 }
             });
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        try {
             this.latch.await();
-        } catch (InterruptedException | IOException var3) {
-            log.error("", var3);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
 
         return zk;
     }
 
     private void watchNode(final ZooKeeper zk) {
+        List<String> nodeList = null;
         try {
-            List<String> nodeList = zk.getChildren("/registry", new Watcher() {
+            nodeList = zk.getChildren("/registry", new Watcher() {
                 @Override
                 public void process(WatchedEvent event) {
                     if (event.getType() == EventType.NodeChildrenChanged) {
@@ -92,10 +97,11 @@ public class ServiceDiscovery implements InitializingBean {
 
             log.debug("node data: {}", dataList);
             this.dataList = dataList;
-        } catch (InterruptedException | KeeperException var7) {
-            log.error("", var7);
+        } catch (KeeperException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
         }
-
     }
 
 }

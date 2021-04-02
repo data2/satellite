@@ -3,7 +3,6 @@ package com.data2.satellite.example.server;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.ComponentScans;
 
 /**
  * @author data2
@@ -13,7 +12,7 @@ import org.springframework.context.annotation.ComponentScans;
 @SpringBootApplication
 @ComponentScan("com.data2.satellite")
 public class Starter {
-    public static void main(Object[] args){
+    public static void main(Object[] args) {
         SpringApplication.run(Starter.class);
     }
 }

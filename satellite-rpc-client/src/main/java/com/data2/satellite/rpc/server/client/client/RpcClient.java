@@ -15,13 +15,10 @@ import org.slf4j.LoggerFactory;
 public class RpcClient extends SimpleChannelInboundHandler<RpcResponse> {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RpcClient.class);
-
+    private final Object obj = new Object();
     private String host;
     private int port;
-
     private RpcResponse response;
-
-    private final Object obj = new Object();
 
     public RpcClient(String host, int port) {
         this.host = host;

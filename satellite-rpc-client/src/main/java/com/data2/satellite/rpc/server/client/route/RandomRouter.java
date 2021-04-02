@@ -13,6 +13,7 @@ import java.util.Random;
 @Component
 public class RandomRouter implements Router {
     private static Random random = new Random();
+
     @Override
     public String route(List<String> sources) {
         return sources.get(random.nextInt(sources.size()));

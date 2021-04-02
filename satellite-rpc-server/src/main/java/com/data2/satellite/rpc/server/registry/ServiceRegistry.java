@@ -1,22 +1,17 @@
 package com.data2.satellite.rpc.server.registry;
 
-import java.io.IOException;
-import java.util.concurrent.CountDownLatch;
-
 import com.data2.satellite.rpc.common.configuration.RegistryConfig;
 import com.data2.satellite.rpc.server.constant.Constant;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.zookeeper.CreateMode;
-import org.apache.zookeeper.KeeperException;
-import org.apache.zookeeper.WatchedEvent;
-import org.apache.zookeeper.Watcher;
-import org.apache.zookeeper.ZooDefs;
-import org.apache.zookeeper.ZooKeeper;
+import org.apache.zookeeper.*;
 import org.apache.zookeeper.data.Stat;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
+
+import java.io.IOException;
+import java.util.concurrent.CountDownLatch;
 
 @Slf4j
 @Component
@@ -52,14 +47,13 @@ public class ServiceRegistry implements InitializingBean {
             latch.await();
         } catch (IOException e) {
             log.error("", e);
-        }
-        catch (InterruptedException ex){
+        } catch (InterruptedException ex) {
             log.error("", ex);
         }
         return zk;
     }
 
-    private void AddRootNode(ZooKeeper zk){
+    private void AddRootNode(ZooKeeper zk) {
         try {
             Stat s = zk.exists(Constant.ZK_REGISTRY_PATH, false);
             if (s == null) {
@@ -79,8 +73,7 @@ public class ServiceRegistry implements InitializingBean {
             log.debug("create zookeeper node ({} => {})", path, data);
         } catch (KeeperException e) {
             log.error("", e);
-        }
-        catch (InterruptedException ex){
+        } catch (InterruptedException ex) {
             log.error("", ex);
         }
     }

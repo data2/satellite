@@ -21,10 +21,10 @@ public class RouterFactory implements ApplicationContextAware {
     @Autowired
     private ClientConfig clientConfig;
 
-    public Router getCustomRouter(){
-        try{
+    public Router getCustomRouter() {
+        try {
             return (Router) applicationContext.getBean(clientConfig.getRouteName());
-        }catch (Exception e){
+        } catch (Exception e) {
             log.error("配置的rpc.client.routeName有误，将使用默认随机方式");
             return applicationContext.getBean(RandomRouter.class);
         }
