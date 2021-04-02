@@ -1,4 +1,4 @@
-package com.data2.satellite.rpc.server.registry;
+package com.data2.satellite.rpc.server.constant;
 
 public interface Constant {
 

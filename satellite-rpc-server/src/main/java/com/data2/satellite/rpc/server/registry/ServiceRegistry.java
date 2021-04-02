@@ -3,7 +3,8 @@ package com.data2.satellite.rpc.server.registry;
 import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
-import lombok.Data;
+import com.data2.satellite.rpc.common.configuration.RegistryConfig;
+import com.data2.satellite.rpc.server.constant.Constant;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.zookeeper.CreateMode;
 import org.apache.zookeeper.KeeperException;
@@ -13,20 +14,18 @@ import org.apache.zookeeper.ZooDefs;
 import org.apache.zookeeper.ZooKeeper;
 import org.apache.zookeeper.data.Stat;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Configuration;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
 @Slf4j
-@Data
 @Component
-@ConfigurationProperties(prefix = "satellite.registry")
 public class ServiceRegistry implements InitializingBean {
 
     private CountDownLatch latch = new CountDownLatch(1);
 
-    private String address;
+    @Autowired
+    private RegistryConfig registryConfig;
 
     private ZooKeeper zooKeeper;
 
@@ -42,7 +41,7 @@ public class ServiceRegistry implements InitializingBean {
     private ZooKeeper connectServer() {
         ZooKeeper zk = null;
         try {
-            zk = new ZooKeeper(address, Constant.ZK_SESSION_TIMEOUT, new Watcher() {
+            zk = new ZooKeeper(registryConfig.getAddress(), Constant.ZK_SESSION_TIMEOUT, new Watcher() {
                 @Override
                 public void process(WatchedEvent event) {
                     if (event.getState() == Event.KeeperState.SyncConnected) {
