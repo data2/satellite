@@ -11,5 +11,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @Data
 @ConfigurationProperties(prefix = "easy.rpc.server")
 public class ServerConfig {
-    private String server;
+    private String address;
 }

@@ -1,5 +1,6 @@
 package com.data2.satellite.rpc.common.protocol;
 
+import com.data2.satellite.rpc.common.utils.SerializationUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.handler.codec.MessageToByteEncoder;

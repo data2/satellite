@@ -3,6 +3,12 @@ package com.data2.satellite.rpc.server.client.registry;
 import com.data2.satellite.rpc.common.configuration.RegistryConfig;
 import com.data2.satellite.rpc.server.client.route.RouterFactory;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.curator.framework.CuratorFramework;
+import org.apache.curator.framework.CuratorFrameworkFactory;
+import org.apache.curator.framework.recipes.cache.TreeCache;
+import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
+import org.apache.curator.framework.recipes.cache.TreeCacheListener;
+import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.KeeperException;
 import org.apache.zookeeper.WatchedEvent;
 import org.apache.zookeeper.Watcher;
@@ -31,15 +37,15 @@ public class ServiceDiscovery implements InitializingBean {
 
     @Autowired
     private RegistryConfig registryConfig;
-    private CountDownLatch latch = new CountDownLatch(1);
+
+    private CuratorFramework curatorFramework;
     private volatile List<String> dataList = new ArrayList();
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        ZooKeeper zk = this.connectServer();
-        if (Objects.nonNull(zk)) {
-            this.watchNode(zk);
-        }
+        connectServer();
+        watchNode();
+
     }
 
     public String discover() {
@@ -50,58 +56,46 @@ public class ServiceDiscovery implements InitializingBean {
         return null;
     }
 
-    private ZooKeeper connectServer() {
-        ZooKeeper zk = null;
-        try {
-            zk = new ZooKeeper(registryConfig.getAddress(), 5000, new Watcher() {
-                @Override
-                public void process(WatchedEvent event) {
-                    if (event.getState() == KeeperState.SyncConnected) {
-                        ServiceDiscovery.this.latch.countDown();
-                    }
-
-                }
-            });
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        try {
-            this.latch.await();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        return zk;
+    private void connectServer() {
+        curatorFramework = CuratorFrameworkFactory.builder()
+                .connectString(registryConfig.getAddress())
+                .retryPolicy(new ExponentialBackoffRetry(1000, 3))
+                .connectionTimeoutMs(15 * 1000)
+                .sessionTimeoutMs(60 * 1000)
+//                .namespace("")
+                .build();
+        curatorFramework.start();
     }
 
-    private void watchNode(final ZooKeeper zk) {
+    private void watchNode() {
         List<String> nodeList = null;
         try {
-            nodeList = zk.getChildren("/registry", new Watcher() {
+            TreeCache treeCache = TreeCache.newBuilder(curatorFramework, "/registry").build();
+            treeCache.getListenable().addListener(new TreeCacheListener() {
                 @Override
-                public void process(WatchedEvent event) {
-                    if (event.getType() == EventType.NodeChildrenChanged) {
-                        ServiceDiscovery.this.watchNode(zk);
+                public void childEvent(CuratorFramework curatorFramework, TreeCacheEvent treeCacheEvent) throws Exception {
+                    if (treeCacheEvent.getType() == TreeCacheEvent.Type.NODE_ADDED ||
+                    treeCacheEvent.getType() == TreeCacheEvent.Type.NODE_REMOVED ||
+                    treeCacheEvent.getType() == TreeCacheEvent.Type.NODE_UPDATED){
+                        reloadData();
                     }
-
                 }
             });
-            List<String> dataList = new ArrayList();
-            Iterator var4 = nodeList.iterator();
-
-            while (var4.hasNext()) {
-                String node = (String) var4.next();
-                byte[] bytes = zk.getData("/registry/" + node, false, (Stat) null);
-                dataList.add(new String(bytes));
-            }
-
-            log.debug("node data: {}", dataList);
-            this.dataList = dataList;
-        } catch (KeeperException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+    private void reloadData() {
+        try {
+            dataList = curatorFramework.getChildren().forPath("/registry");
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        log.debug("load node data: {}", dataList);
+    }
+
+
+
 
 }
