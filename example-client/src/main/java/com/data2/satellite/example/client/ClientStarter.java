@@ -17,17 +17,17 @@ import org.springframework.web.bind.annotation.RestController;
 @SpringBootApplication
 @RestController
 @ComponentScan("com.data2.satellite")
-public class Starter {
+public class ClientStarter {
 
     @Autowired
     private RpcProxy rpcProxy;
 
-    public static void main(Object[] args) {
-        SpringApplication.run(Starter.class);
+    public static void main(String[] args) {
+        SpringApplication.run(ClientStarter.class);
     }
 
     @GetMapping("/test")
-    public void test() {
-        ((HiService) rpcProxy.create(HiService.class)).hi();
+    public String test() {
+        return rpcProxy.create(HiService.class).hi();
     }
 }

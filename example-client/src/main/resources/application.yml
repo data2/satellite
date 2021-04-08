@@ -1,5 +1,11 @@
-satellite:
-  registry:
-    address:
-  server:
-    address: 10.143.131.60:9527
+
+easy:
+  rpc:
+    registry:
+      address: localhost:2181
+      namespace: test
+    client:
+      routeName: RandomRouter
+
+server:
+  port: 8081
