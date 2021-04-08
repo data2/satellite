@@ -9,24 +9,13 @@ import org.apache.curator.framework.recipes.cache.TreeCache;
 import org.apache.curator.framework.recipes.cache.TreeCacheEvent;
 import org.apache.curator.framework.recipes.cache.TreeCacheListener;
 import org.apache.curator.retry.ExponentialBackoffRetry;
-import org.apache.zookeeper.KeeperException;
-import org.apache.zookeeper.WatchedEvent;
-import org.apache.zookeeper.Watcher;
-import org.apache.zookeeper.Watcher.Event.EventType;
-import org.apache.zookeeper.Watcher.Event.KeeperState;
-import org.apache.zookeeper.ZooKeeper;
-import org.apache.zookeeper.data.Stat;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.CountDownLatch;
 
 @Slf4j
 @Component
@@ -45,7 +34,6 @@ public class ServiceDiscovery implements InitializingBean {
     public void afterPropertiesSet() throws Exception {
         connectServer();
         watchNode();
-
     }
 
     public String discover() {
@@ -62,25 +50,25 @@ public class ServiceDiscovery implements InitializingBean {
                 .retryPolicy(new ExponentialBackoffRetry(1000, 3))
                 .connectionTimeoutMs(15 * 1000)
                 .sessionTimeoutMs(60 * 1000)
-//                .namespace("")
+                .namespace(registryConfig.getNamespace())
                 .build();
         curatorFramework.start();
     }
 
     private void watchNode() {
-        List<String> nodeList = null;
         try {
             TreeCache treeCache = TreeCache.newBuilder(curatorFramework, "/registry").build();
             treeCache.getListenable().addListener(new TreeCacheListener() {
                 @Override
                 public void childEvent(CuratorFramework curatorFramework, TreeCacheEvent treeCacheEvent) throws Exception {
                     if (treeCacheEvent.getType() == TreeCacheEvent.Type.NODE_ADDED ||
-                    treeCacheEvent.getType() == TreeCacheEvent.Type.NODE_REMOVED ||
-                    treeCacheEvent.getType() == TreeCacheEvent.Type.NODE_UPDATED){
+                            treeCacheEvent.getType() == TreeCacheEvent.Type.NODE_REMOVED ||
+                            treeCacheEvent.getType() == TreeCacheEvent.Type.NODE_UPDATED) {
                         reloadData();
                     }
                 }
             });
+            reloadData();
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -88,14 +76,15 @@ public class ServiceDiscovery implements InitializingBean {
 
     private void reloadData() {
         try {
-            dataList = curatorFramework.getChildren().forPath("/registry");
+            List<String> dataListPath = curatorFramework.getChildren().forPath("/registry");
+            for (String path : dataListPath) {
+                dataList.add(new String(curatorFramework.getData().forPath("/registry/" + path)));
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
         log.debug("load node data: {}", dataList);
     }
-
-
 
 
 }
