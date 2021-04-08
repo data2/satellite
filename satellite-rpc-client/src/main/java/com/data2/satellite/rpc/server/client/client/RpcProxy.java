@@ -25,7 +25,7 @@ public class RpcProxy {
     private ServiceDiscovery serviceDiscovery;
 
     public <T> T create(Class<T> interfaceClass) {
-        return (T) java.lang.reflect.Proxy.newProxyInstance(
+        return (T)java.lang.reflect.Proxy.newProxyInstance(
                 interfaceClass.getClassLoader(),
                 new Class<?>[]{interfaceClass},
                 new InvocationHandler() {
@@ -39,8 +39,9 @@ public class RpcProxy {
                         request.setParameterTypes(method.getParameterTypes());
                         request.setParameters(args);
 
-                        String serverAddress = null;
-                        if (!StringUtils.isEmpty(serverAddress = serviceDiscovery.discover())) {
+                        String serverAddress =  serviceDiscovery.discover();
+                        System.out.println("12345678"+serverAddress);
+                        if (!StringUtils.isEmpty(serverAddress)) {
                             String[] array = serverAddress.split(":");
                             String host = array[0];
                             int port = Integer.parseInt(array[1]);
