@@ -12,4 +12,5 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "easy.rpc.registry")
 public class RegistryConfig {
     private String address;
+    private String namespace;
 }
