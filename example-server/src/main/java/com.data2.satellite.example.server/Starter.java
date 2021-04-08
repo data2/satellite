@@ -1,5 +1,7 @@
 package com.data2.satellite.example.server;
 
+import com.data2.satellite.rpc.server.server.RpcServer;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -16,9 +18,10 @@ import org.springframework.web.bind.annotation.RestController;
 @ComponentScan("com.data2.satellite")
 @RestController
 public class Starter {
-    public static void main(String[] args) {
+
+    public static void main(String[] args) throws Exception {
         SpringApplication.run(Starter.class);
-        System.out.println("服务启动OK");
+
     }
 
     @GetMapping

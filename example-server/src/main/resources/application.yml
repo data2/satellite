@@ -1,6 +1,11 @@
+
+
 easy:
   rpc:
     registry:
       address: localhost:2181
+#      namespace: rpc
     server:
-      address: localhost:8080
+      address: localhost:8081
+server:
+  port: 8081
