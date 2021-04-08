@@ -20,12 +20,15 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -33,7 +36,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Slf4j
 @Data
 @Component
-public class RpcServer implements ApplicationContextAware, InitializingBean {
+public class RpcServer implements ApplicationContextAware, CommandLineRunner, DisposableBean {
 
     private static ThreadPoolExecutor threadPoolExecutor;
     @Autowired
@@ -54,7 +57,7 @@ public class RpcServer implements ApplicationContextAware, InitializingBean {
     }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void run(String... args) throws InterruptedException {
         EventLoopGroup bossGroup = new NioEventLoopGroup();
         EventLoopGroup workerGroup = new NioEventLoopGroup();
         try {
@@ -74,16 +77,10 @@ public class RpcServer implements ApplicationContextAware, InitializingBean {
                     .childOption(ChannelOption.SO_KEEPALIVE, true);
 
             String[] array = serverConfig.getAddress().split(":");
-            String host = array[0];
-            int port = Integer.parseInt(array[1]);
+            ChannelFuture future = bootstrap.bind(array[0], Integer.parseInt(array[1])).sync();
+            log.debug("Server started on port {}", Integer.parseInt(array[1]));
 
-            ChannelFuture future = bootstrap.bind(host, port).sync();
-            log.debug("Server started on port {}", port);
-
-            if (serviceRegistry != null) {
-                serviceRegistry.register(serverConfig.getAddress());
-            }
-
+            serviceRegistry.registerServerAndService(serverConfig.getAddress(), handlerMap);
             future.channel().closeFuture().sync();
         } finally {
             workerGroup.shutdownGracefully();
@@ -92,4 +89,8 @@ public class RpcServer implements ApplicationContextAware, InitializingBean {
     }
 
 
+    @Override
+    public void destroy() throws Exception {
+        log.info("1233");
+    }
 }

@@ -14,6 +14,10 @@ import org.springframework.core.NestedExceptionUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
+import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Slf4j
@@ -27,10 +31,10 @@ public class ServiceRegistry implements InitializingBean, DisposableBean {
 
     private CuratorFramework curatorFramework;
 
-    public void register(String data) {
+    public void registerServerAndService(String data, Map<String, Object> handlerMap) {
         if (!StringUtils.isEmpty(data)) {
             AddRootNode();
-            createNode(data);
+            createNodeForServerAndService(data, handlerMap);
         }
     }
 
@@ -40,7 +44,7 @@ public class ServiceRegistry implements InitializingBean, DisposableBean {
                 .retryPolicy(new ExponentialBackoffRetry(1000, 3))
                 .connectionTimeoutMs(15 * 1000)
                 .sessionTimeoutMs(60 * 1000)
-//                .namespace("")
+                .namespace(registryConfig.getNamespace())
                 .build();
         curatorFramework.start();
     }
@@ -53,10 +57,15 @@ public class ServiceRegistry implements InitializingBean, DisposableBean {
         }
     }
 
-    private void createNode(String data) {
+    private void createNodeForServerAndService(String data, Map<String, Object> handlerMap) {
         try {
-            serverNodeFullPath = curatorFramework.create().withMode(CreateMode.EPHEMERAL_SEQUENTIAL).forPath(Constant.ZK_DATA_PATH, data.getBytes());
-            log.info("create zookeeper node ({} => {})", serverNodeFullPath, data);
+            serverNodeFullPath = curatorFramework.create().withMode(CreateMode.PERSISTENT_SEQUENTIAL).forPath(Constant.ZK_DATA_PATH, data.getBytes());
+            log.info("create zookeeper server node ({} => {})", serverNodeFullPath, data);
+
+            for (String key : handlerMap.keySet()) {
+                curatorFramework.create().withMode(CreateMode.EPHEMERAL).forPath(serverNodeFullPath + "/" + key, null);
+                log.info("create zookeeper service node ({})", key);
+            }
         } catch (Exception e) {
             log.error(NestedExceptionUtils.buildMessage("创建zk服务节点失败", e));
         }
@@ -72,16 +81,24 @@ public class ServiceRegistry implements InitializingBean, DisposableBean {
     }
 
     @Override
+    @PreDestroy
     public void destroy() throws Exception {
-        log.info("123456789");
-        if (Objects.nonNull(curatorFramework)){
+        log.info("destroy start");
+        if (Objects.nonNull(curatorFramework)) {
             try {
+                List<String> interfaces = curatorFramework.getChildren().forPath(serverNodeFullPath);
+                for (String interfaceStr : interfaces) {
+                    curatorFramework.delete().guaranteed().forPath(serverNodeFullPath + "/" + interfaceStr);
+                    log.info("delete zookeeper service node success，interface{}", interfaceStr);
+                }
                 curatorFramework.delete().guaranteed().forPath(serverNodeFullPath);
-                log.info("删除zk服务节点成功，路径{}",serverNodeFullPath);
-            }catch (Exception e){
+                log.info("delete zookeeper server node success，路径{}", serverNodeFullPath);
+            } catch (Exception e) {
                 log.warn("删除zk服务节点失败，等待临时节点超时");
             }
             curatorFramework.close();
         }
     }
+
+
 }
