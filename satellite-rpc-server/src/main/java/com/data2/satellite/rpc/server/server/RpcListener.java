@@ -7,5 +7,9 @@ package com.data2.satellite.rpc.server.server;
  */
 public interface RpcListener {
 
+    /**
+     *
+     * @throws InterruptedException
+     */
     void listen() throws InterruptedException;
 }

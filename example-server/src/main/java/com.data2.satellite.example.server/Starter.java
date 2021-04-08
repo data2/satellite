@@ -1,9 +1,6 @@
 package com.data2.satellite.example.server;
 
-import com.data2.satellite.rpc.server.server.RpcServer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -25,7 +22,7 @@ public class Starter {
     }
 
     @GetMapping
-    public String test(){
+    public String test() {
         return "ok";
     }
 }

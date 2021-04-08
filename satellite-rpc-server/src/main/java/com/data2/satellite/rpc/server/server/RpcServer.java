@@ -20,15 +20,12 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.springframework.beans.BeansException;
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ThreadPoolExecutor;
@@ -36,7 +33,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 @Slf4j
 @Data
 @Component
-public class RpcServer implements ApplicationContextAware, CommandLineRunner, DisposableBean {
+public class RpcServer implements ApplicationContextAware, CommandLineRunner {
 
     private static ThreadPoolExecutor threadPoolExecutor;
     @Autowired
@@ -88,9 +85,4 @@ public class RpcServer implements ApplicationContextAware, CommandLineRunner, Di
         }
     }
 
-
-    @Override
-    public void destroy() throws Exception {
-        log.info("1233");
-    }
 }

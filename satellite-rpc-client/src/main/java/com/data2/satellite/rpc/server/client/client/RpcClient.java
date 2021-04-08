@@ -9,12 +9,11 @@ import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class RpcClient extends SimpleChannelInboundHandler<RpcResponse> {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RpcClient.class);
     private final Object obj = new Object();
     private String host;
     private int port;
@@ -23,6 +22,11 @@ public class RpcClient extends SimpleChannelInboundHandler<RpcResponse> {
     public RpcClient(String host, int port) {
         this.host = host;
         this.port = port;
+    }
+
+    public RpcClient(ServerInfo serverInfo) {
+        this.host = serverInfo.getHost();
+        this.port = serverInfo.getPort();
     }
 
     @Override
@@ -36,7 +40,7 @@ public class RpcClient extends SimpleChannelInboundHandler<RpcResponse> {
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        LOGGER.error("client caught exception", cause);
+        log.error("client caught exception", cause);
         ctx.close();
     }
 

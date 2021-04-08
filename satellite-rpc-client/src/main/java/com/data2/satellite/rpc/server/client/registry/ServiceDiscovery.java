@@ -1,7 +1,9 @@
 package com.data2.satellite.rpc.server.client.registry;
 
 import com.data2.satellite.rpc.common.configuration.RegistryConfig;
+import com.data2.satellite.rpc.server.client.client.ServerInfo;
 import com.data2.satellite.rpc.server.client.route.RouterFactory;
+import com.google.common.collect.Lists;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.curator.framework.CuratorFramework;
@@ -15,7 +17,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.CollectionUtils;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
@@ -26,12 +27,10 @@ public class ServiceDiscovery implements InitializingBean {
 
     @Autowired
     private RouterFactory routerFactory;
-
     @Autowired
     private RegistryConfig registryConfig;
-
     private CuratorFramework curatorFramework;
-    private volatile List<String> dataList = new ArrayList();
+    private volatile List<ServerInfo> dataList = Lists.newArrayList();
     private volatile HashSet<String> interfaceList = new HashSet<>();
 
 
@@ -41,7 +40,7 @@ public class ServiceDiscovery implements InitializingBean {
         watchNode();
     }
 
-    public String discover() {
+    public ServerInfo discover() {
         if (!CollectionUtils.isEmpty(dataList)) {
             return routerFactory.getCustomRouter().route(dataList);
         }
@@ -83,7 +82,7 @@ public class ServiceDiscovery implements InitializingBean {
         try {
             List<String> dataListPath = curatorFramework.getChildren().forPath("/registry");
             for (String path : dataListPath) {
-                dataList.add(new String(curatorFramework.getData().forPath("/registry/" + path)));
+                dataList.add(parseServer(new String(curatorFramework.getData().forPath("/registry/" + path))));
                 interfaceList.addAll(curatorFramework.getChildren().forPath("/registry/" + path));
             }
         } catch (Exception e) {
@@ -91,6 +90,11 @@ public class ServiceDiscovery implements InitializingBean {
         }
         log.info("load node data: {}", dataList);
         log.info("load interface node data: {}", interfaceList);
+    }
+
+    private ServerInfo parseServer(String s) {
+        String[] arr = s.split("\\:");
+        return new ServerInfo(arr[0], Integer.parseInt(arr[1]));
     }
 
 

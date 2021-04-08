@@ -66,7 +66,7 @@ public class ServiceRegistry implements InitializingBean, DisposableBean {
                 curatorFramework.create().withMode(CreateMode.EPHEMERAL).forPath(serverNodeFullPath + "/" + key, null);
                 log.info("create zookeeper service node ({})", key);
             }
-        }catch (KeeperException.NodeExistsException e1){
+        } catch (KeeperException.NodeExistsException e1) {
             log.warn("根节点已经存在");
         } catch (Exception e) {
             log.error(NestedExceptionUtils.buildMessage("创建zk服务节点失败", e));

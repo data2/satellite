@@ -1,5 +1,6 @@
 package com.data2.satellite.rpc.server.client.route;
 
+import com.data2.satellite.rpc.server.client.client.ServerInfo;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -15,7 +16,7 @@ public class RandomRouter implements Router {
     private static Random random = new Random();
 
     @Override
-    public String route(List<String> sources) {
+    public ServerInfo route(List<ServerInfo> sources) {
         return sources.get(random.nextInt(sources.size()));
     }
 }

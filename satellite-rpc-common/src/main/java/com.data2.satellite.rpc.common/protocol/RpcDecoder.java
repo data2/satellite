@@ -9,6 +9,8 @@ import java.util.List;
 
 public class RpcDecoder extends ByteToMessageDecoder {
 
+    public static final Integer NUMBER = 4;
+
     private Class<?> genericClass;
 
     public RpcDecoder(Class<?> genericClass) {
@@ -17,14 +19,12 @@ public class RpcDecoder extends ByteToMessageDecoder {
 
     @Override
     public final void decode(ChannelHandlerContext ctx, ByteBuf in, List<Object> out) throws Exception {
-        if (in.readableBytes() < 4) {
+        if (in.readableBytes() < NUMBER) {
             return;
         }
         in.markReaderIndex();
         int dataLength = in.readInt();
-        /*if (dataLength <= 0) {
-            ctx.close();
-        }*/
+
         if (in.readableBytes() < dataLength) {
             in.resetReaderIndex();
             return;
