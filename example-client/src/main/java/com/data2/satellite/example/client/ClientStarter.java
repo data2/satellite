@@ -3,6 +3,7 @@ package com.data2.satellite.example.client;
 import com.data2.satellite.example.server.api.HiService;
 import com.data2.satellite.rpc.server.client.client.RpcProxy;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.ComponentScan;
@@ -17,7 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 @SpringBootApplication
 @RestController
 @ComponentScan("com.data2.satellite")
-public class ClientStarter {
+public class ClientStarter implements CommandLineRunner {
 
     @Autowired
     private RpcProxy rpcProxy;
@@ -26,8 +27,8 @@ public class ClientStarter {
         SpringApplication.run(ClientStarter.class);
     }
 
-    @GetMapping("/test")
-    public String test() {
-        return rpcProxy.create(HiService.class).hi();
+    @Override
+    public void run(String... args) throws Exception {
+        System.out.println(rpcProxy.create(HiService.class).hi());
     }
 }
