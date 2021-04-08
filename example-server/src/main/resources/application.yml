@@ -4,7 +4,7 @@ easy:
   rpc:
     registry:
       address: localhost:2181
-#      namespace: rpc
+      namespace: rpc_namespace
     server:
       address: localhost:8081
 server:

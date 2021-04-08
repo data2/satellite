@@ -7,6 +7,7 @@ import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;
 import org.apache.curator.retry.ExponentialBackoffRetry;
 import org.apache.zookeeper.CreateMode;
+import org.apache.zookeeper.KeeperException;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,7 +15,6 @@ import org.springframework.core.NestedExceptionUtils;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 
-import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 import java.util.List;
 import java.util.Map;
@@ -51,7 +51,7 @@ public class ServiceRegistry implements InitializingBean, DisposableBean {
 
     private void AddRootNode() {
         try {
-            curatorFramework.create().withProtection().withMode(CreateMode.PERSISTENT).forPath(Constant.ZK_REGISTRY_PATH);
+            curatorFramework.create().withMode(CreateMode.PERSISTENT).forPath(Constant.ZK_REGISTRY_PATH);
         } catch (Exception e) {
             log.error(NestedExceptionUtils.buildMessage("创建zk服务根节点失败", e));
         }
@@ -59,13 +59,15 @@ public class ServiceRegistry implements InitializingBean, DisposableBean {
 
     private void createNodeForServerAndService(String data, Map<String, Object> handlerMap) {
         try {
-            serverNodeFullPath = curatorFramework.create().withMode(CreateMode.PERSISTENT_SEQUENTIAL).forPath(Constant.ZK_DATA_PATH, data.getBytes());
+            serverNodeFullPath = curatorFramework.create().creatingParentsIfNeeded().withMode(CreateMode.PERSISTENT_SEQUENTIAL).forPath(Constant.ZK_DATA_PATH, data.getBytes());
             log.info("create zookeeper server node ({} => {})", serverNodeFullPath, data);
 
             for (String key : handlerMap.keySet()) {
                 curatorFramework.create().withMode(CreateMode.EPHEMERAL).forPath(serverNodeFullPath + "/" + key, null);
                 log.info("create zookeeper service node ({})", key);
             }
+        }catch (KeeperException.NodeExistsException e1){
+            log.warn("根节点已经存在");
         } catch (Exception e) {
             log.error(NestedExceptionUtils.buildMessage("创建zk服务节点失败", e));
         }
